@@ -15,10 +15,27 @@ func (r *Repo) ensureGit() error {
 		if err := os.MkdirAll(r.CloneDir, 0755); err != nil {
 			return err
 		}
-		return r.gitClone()
+		// 第一次 clone
+		if err := r.gitClone(); err != nil {
+			return err
+		}
+		return r.saveCommit()
 	}
+
 	// 已存在就 pull
-	return r.gitPull()
+	// 先检查是否有新 commit，没有则不拉取和构建
+	hasNew, err := r.hasNewCommit()
+	if err != nil {
+		return fmt.Errorf("failed to check for new commit: %w", err)
+	}
+	if !hasNew {
+		return nil // 没有新 commit，直接返回
+	}
+
+	if err := r.gitPull(); err != nil {
+		return err
+	}
+	return r.saveCommit()
 }
 
 // ========= clone =========

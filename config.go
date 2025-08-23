@@ -12,17 +12,19 @@ type Config struct {
 	LogLevel        string      `yaml:"log_level"`
 	IntervalMinutes int         `yaml:"interval_minutes"`
 	Repos           []Repo      `yaml:"repos"`
+	Update          bool        `yaml:"update" default:"false"`
 	SelfUpdate      *SelfUpdate `yaml:"self_update"`
 }
 
 type SelfUpdate struct {
-	Enable    bool     `yaml:"enable"`
-	URL       string   `yaml:"url"`
-	Branch    string   `yaml:"branch"`
-	CloneDir  string   `yaml:"clone_dir"`
-	SourceDir string   `yaml:"source_dir"`
-	OutputDir string   `yaml:"output_dir"`
-	BuildCmd  []string `yaml:"build_cmd"`
+	Enable       bool     `yaml:"enable"`
+	URL          string   `yaml:"url"`
+	Branch       string   `yaml:"branch"`
+	CloneDir     string   `yaml:"clone_dir"`
+	SourceDir    string   `yaml:"source_dir"`
+	OutputDir    string   `yaml:"output_dir"`
+	BuildCmd     []string `yaml:"build_cmd"`
+	ArtifactName string   `yaml:"artifact_name"`
 }
 
 type Repo struct {
@@ -57,6 +59,16 @@ func LoadConfig(path string) (*Config, error) {
 	}
 	if cfg.IntervalMinutes <= 0 {
 		cfg.IntervalMinutes = 5
+	}
+
+	if cfg.SelfUpdate != nil && cfg.SelfUpdate.ArtifactName == "" {
+		cfg.SelfUpdate.ArtifactName = "main"
+	}
+
+	for i := range cfg.Repos {
+		if cfg.Repos[i].ArtifactName == "" {
+			cfg.Repos[i].ArtifactName = "main"
+		}
 	}
 	return &cfg, nil
 }
