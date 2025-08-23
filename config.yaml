@@ -1,0 +1,46 @@
+# 全局日志级别（debug|info|warn|error）
+log_level: info
+
+# 每轮检查间隔（分钟）
+interval_minutes: 1
+
+# 仓库列表
+repos:
+  - name: "lingyunfrp-panel-frontend"
+    # 支持 https / ssh
+    url: "https://github.com/YCLY-IT/LingYunFrp-Panel-Frontend.git"
+    branch: "main"
+
+    auth:
+      type: "https"        # https | ssh
+      # https 方式：用户名 + PAT/Token
+      username: "oauth2"
+      token:    "ghp_xxxxxxxxxxxxxxxxxxxx"
+      # ssh 方式：私钥路径 + 可选 passphrase
+      # ssh_key: "/home/ci/.ssh/id_rsa"
+      # ssh_passphrase: ""  # 如无密码可省略
+      
+    # 本地克隆目录（会被自动创建）
+    clone_dir: "./workspace/myproject"
+    # 解压 / 拉取后放置源码的位置
+    source_dir: "./workspace/myproject/src"
+    # 编译成功后二进制输出目录
+    output_dir: "./workspace/myproject/dist"
+    # 编译命令（支持多行；用数组）
+    build_cmd:
+      - pnpm install
+      - pnpm run build
+    # 编译后产物名称（可选，用于日志）
+    artifact_name: "app"
+
+# 自更新专用字段（**不在 repos 内**）
+self_update:
+  enable: true
+  url: "https://github.com/acme/autobuild.git"
+  branch: "main"
+  # 以下三个目录全部用 **当前目录** (.)
+  clone_dir: "."         # 直接原地
+  source_dir: "."
+  output_dir: "."
+  build_cmd:
+    - go build -o autobuild-new .
